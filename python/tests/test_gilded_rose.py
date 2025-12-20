@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import unittest
 
+import pytest
+
 from gilded_rose import Item, GildedRose
 
 
@@ -20,6 +22,28 @@ class GildedRoseTest(unittest.TestCase):
 # sulfuras -> never changes from 80
 # aged brie -> quality increases
 # backstage passes -> will be 0 when sellIn <=0
+@pytest.mark.parametrize("item_name,starting_quality, expected_quality", [
+    ("foo", 2, 0),  # base case for all items
+    ("Sulfuras, Hand of Ragnaros", 80, 80),  # Sulfuras, Hand of Ragnaros case, dont change quality
+    ("Aged Brie", 1, 2),  # # Increment by one
+    ("Backstage passes to a TAFKAL80ETC concert", 100, 0),  # backstage will become 0
+])
+def test_degrade_quality_twice_faster(item_name, starting_quality, expected_quality):
+    items = [Item(item_name, 0, starting_quality)]
+    gilded_rose = GildedRose(items)
+    gilded_rose.update_quality()
+    assert gilded_rose.items[0].quality == expected_quality
+
+
+# code issues found after this
+# aged brie fails this case as we double increment for it after sellin is <=0
+
+# more cases around boundary conditions needed
+# check around behavior change or normal edge
+# check when sellIn becomes 0 from 1,-1 from 0
+# check when quality goes from 49->50,50 -> 51 (not allowed)m 49-> 51
+# check basic clamp cases as increment +2 or +3 will make it go above 50
+
 
 # 2.
 # make sure quality >=0
