@@ -136,7 +136,6 @@ def test_sulfuras_state_maintained(sell_in, days_passed):
 
     item_quality = gilded_rose.items[0].quality
     item_sell_in = gilded_rose.items[0].sell_in
-    print(item_sell_in, item_quality)
     assert item_quality == 80 and item_sell_in == sell_in
 
 
@@ -146,6 +145,29 @@ def test_sulfuras_state_maintained(sell_in, days_passed):
 #   -- q+=2 -> 5 > sellIn<=10
 #   -- q+=3 -> 0 > sellIn<=5
 #   -- q = 0 selling <= 0
+
+@pytest.mark.parametrize("sell_in,days_passed,starting_quality,expected_quality", [
+    (20, 5, 40, 45),  # check increment
+    (20, 10, 40, 50),  # check edge case around boundary when 10 days are remaining
+    (20, 11, 10, 22),  # check +2 increments
+    (10, 1, 49, 50),  # quality clamp on rollover
+    (6, 1, 40, 42),  # check edge case around boundary when 5 days are remaining
+    (6, 2, 40, 45),  # check crossover to +3
+    (5, 1, 48, 50),  # quality clamp on rollover
+    (2, 2, 20, 26),  # check inc to +3
+    (2, 3, 20, 0),  # check reset to zero
+    (0, 1, 50, 0),  # check reset to zero
+])
+def test_backstage_passes(sell_in, days_passed, starting_quality, expected_quality):
+    items = [Item('Backstage passes to a TAFKAL80ETC concert', sell_in, starting_quality)]
+    gilded_rose = GildedRose(items)
+
+    for _ in range(days_passed):
+        gilded_rose.update_quality()
+
+    item_quality = gilded_rose.items[0].quality
+    assert item_quality == expected_quality
+
 
 # 7.
 # conjured q-=2 for each day
