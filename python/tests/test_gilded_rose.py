@@ -123,6 +123,22 @@ def test_quality_is_never_negative(item_name, sell_in, starting_quality, expecte
 # preserve state of sulfuras no matter what, no quality change no sell in change needed
 # sulfuras quality=80
 # sulfuras quality dont change ever
+@pytest.mark.parametrize("sell_in,days_passed", [
+    (1, 1),  # maintain state
+    (1, 0)  # check init logic and state
+])
+def test_sulfuras_state_maintained(sell_in, days_passed):
+    items = [Item('Sulfuras, Hand of Ragnaros', sell_in, 80)]
+    gilded_rose = GildedRose(items)
+
+    for _ in range(days_passed):
+        gilded_rose.update_quality()
+
+    item_quality = gilded_rose.items[0].quality
+    item_sell_in = gilded_rose.items[0].sell_in
+    print(item_sell_in, item_quality)
+    assert item_quality == 80 and item_sell_in == sell_in
+
 
 # 6.
 # Backstage passes -> if one day passed then
