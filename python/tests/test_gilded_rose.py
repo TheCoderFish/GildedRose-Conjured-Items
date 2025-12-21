@@ -77,6 +77,26 @@ def test_quality_is_never_negative_after_x_days(item_name, sell_in, starting_qua
 
 # 3.
 # aged brie +1 quality from number of days
+def test_aged_brie_increment_by_one():
+    items = [Item('Aged Brie', 10, 0)]
+    gilded_rose = GildedRose(items)
+    for _ in range(10):
+        gilded_rose.update_quality()
+    assert gilded_rose.items[0].quality == 10
+
+
+@pytest.mark.parametrize("sell_in, starting_quality, expected_quality", [
+    (10, 5, 15),  # base case
+    (10, 49, 50),  # clamp 50 case
+    (1, 50, 50),  # already 50
+])
+def test_aged_brie_increment_by_one_multiple(sell_in, starting_quality, expected_quality):
+    items = [Item('Aged Brie', sell_in, starting_quality)]
+    gilded_rose = GildedRose(items)
+    for _ in range(sell_in):
+        gilded_rose.update_quality()
+    assert gilded_rose.items[0].quality == expected_quality
+
 
 # 4.
 # q <= 50
