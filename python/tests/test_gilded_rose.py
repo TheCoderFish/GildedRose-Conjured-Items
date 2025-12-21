@@ -177,6 +177,18 @@ def test_backstage_passes(sell_in, days_passed, starting_quality, expected_quali
 
 # 9.
 # anything other than sulfuras with each day passed sellIn-=1
+@pytest.mark.parametrize("item_name,sell_in, days_passed, expected_sell_in", [
+    ("foo", 2, 2, 0),  # base case for all items
+    ("Sulfuras, Hand of Ragnaros", 2, 2, 2),  # edge case
+    ("foo", 0, 2, -2)
+])
+def test_decrement_sell_in(item_name, sell_in, days_passed, expected_sell_in):
+    items = [Item(item_name, sell_in, 20)]
+    gilded_rose = GildedRose(items)
+    for _ in range(days_passed):
+        gilded_rose.update_quality()
+    assert gilded_rose.items[0].sell_in == expected_sell_in
+
 
 if __name__ == '__main__':
     unittest.main()
