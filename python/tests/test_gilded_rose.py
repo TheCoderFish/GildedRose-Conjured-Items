@@ -47,6 +47,33 @@ def test_degrade_quality_twice_faster(item_name, starting_quality, expected_qual
 
 # 2.
 # make sure quality >=0
+@pytest.mark.parametrize("item_name, sell_in, starting_quality", [
+    ("foo", 0, 0),  # if quality stays 0 when sell in will move negative
+    ("foo", -1, 0),  # if quality continues to stay the same when sell in is already past before
+    ("Sulfuras, Hand of Ragnaros", 0, 80),  # Sulfuras, Hand of Ragnaros case, dont change quality
+    ("Aged Brie", 0, 1),  # should not go negative
+    ("Backstage passes to a TAFKAL80ETC concert", 0, 0),  # backstage should remain 0
+])
+def test_quality_is_never_negative(item_name, sell_in, starting_quality):
+    items = [Item(item_name, sell_in, starting_quality)]
+    gilded_rose = GildedRose(items)
+    gilded_rose.update_quality()
+    assert gilded_rose.items[0].quality >= 0
+
+
+@pytest.mark.parametrize("item_name, sell_in, starting_quality, days", [
+    ("foo", 0, 5, 100),  # check quality stays clamped to zero after 100 days
+    ("Sulfuras, Hand of Ragnaros", 0, 80, 1),  # Sulfuras, Hand of Ragnaros case, dont change quality
+    ("Aged Brie", 0, 10, 100),  # should not go negative
+    ("Backstage passes to a TAFKAL80ETC concert", 0, 100, 100),  # backstage should remain 0
+])
+def test_quality_is_never_negative_after_x_days(item_name, sell_in, starting_quality, days):
+    items = [Item(item_name, sell_in, starting_quality)]
+    gilded_rose = GildedRose(items)
+    for _ in range(days):
+        gilded_rose.update_quality()
+    assert gilded_rose.items[0].quality >= 0
+
 
 # 3.
 # aged brie +1 quality from number of days
