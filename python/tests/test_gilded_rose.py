@@ -102,6 +102,22 @@ def test_aged_brie_increment_by_one_multiple(sell_in, starting_quality, expected
 # q <= 50
 # except
 # sulfuras q=80
+# brie is already covered
+@pytest.mark.skip(reason="can be ignored as repeat testing of same scenario")
+@pytest.mark.parametrize("item_name, sell_in, starting_quality,expected_quality", [
+    ("foo", 10, 5, 0),  # if quality stays 0 when sell in will move negative
+    ("Sulfuras, Hand of Ragnaros", 1, 80, 80),  # Sulfuras, Hand of Ragnaros case, dont change quality
+])
+def test_quality_is_never_negative(item_name, sell_in, starting_quality, expected_quality):
+    items = [Item(item_name, sell_in, starting_quality)]
+    gilded_rose = GildedRose(items)
+
+    for _ in range(sell_in):
+        gilded_rose.update_quality()
+
+    item_quality = gilded_rose.items[0].quality
+    assert 0 <= item_quality <= expected_quality
+
 
 # 5.
 # preserve state of sulfuras no matter what, no quality change no sell in change needed
