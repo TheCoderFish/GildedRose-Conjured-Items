@@ -171,6 +171,12 @@ def test_backstage_passes(sell_in, days_passed, starting_quality, expected_quali
 
 # 7.
 # conjured q-=2 for each day
+def test_conjured_items_degrade_twice():
+    items = [Item("Conjured Mana Cake", 1, 2)]
+    gilded_rose = GildedRose(items)
+    gilded_rose.update_quality()
+    assert gilded_rose.items[0].quality == 0
+
 
 # 8.
 # anything other than sulfuras,backstage passes,conjured items with each day passed q-=1
