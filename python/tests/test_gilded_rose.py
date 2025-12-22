@@ -178,6 +178,22 @@ def test_conjured_items_degrade_twice():
     assert gilded_rose.items[0].quality == 0
 
 
+@pytest.mark.parametrize("sell_in,days_passed,starting_quality,expected_quality", [
+    (1, 1, 2, 0),  # base
+    (1, 2, 2, 0),  # check non negative quality
+    (1, 2, 3, 0),  # check rollover as it should not get -1
+])
+def test_conjured_items_degrade_twice_params(sell_in, days_passed, starting_quality, expected_quality):
+    items = [Item('Conjured Mana Cake', sell_in, starting_quality)]
+    gilded_rose = GildedRose(items)
+
+    for _ in range(days_passed):
+        gilded_rose.update_quality()
+
+    item_quality = gilded_rose.items[0].quality
+    assert item_quality == expected_quality
+
+
 # 8.
 # anything other than sulfuras,backstage passes,conjured items with each day passed q-=1
 
