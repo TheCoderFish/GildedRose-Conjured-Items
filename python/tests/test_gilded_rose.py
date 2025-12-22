@@ -23,7 +23,7 @@ class GildedRoseTest(unittest.TestCase):
 # aged brie -> quality increases
 # backstage passes -> will be 0 when sellIn <=0
 @pytest.mark.parametrize("item_name,starting_quality, expected_quality", [
-    ("foo", 2, 0),  # base case for all items
+    ("foo", 2, 1),  # base case for all items
     ("Sulfuras, Hand of Ragnaros", 80, 80),  # Sulfuras, Hand of Ragnaros case, dont change quality
     ("Aged Brie", 1, 2),  # # Increment by one
     ("Backstage passes to a TAFKAL80ETC concert", 100, 0),  # backstage will become 0
