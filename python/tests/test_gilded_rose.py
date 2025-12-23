@@ -193,11 +193,7 @@ def test_conjured_items_degrade_twice_params(sell_in, days_passed, starting_qual
     item_quality = gilded_rose.items[0].quality
     assert item_quality == expected_quality
 
-
 # 8.
-# anything other than sulfuras,backstage passes,conjured items with each day passed q-=1
-
-# 9.
 # anything other than sulfuras with each day passed sellIn-=1
 @pytest.mark.parametrize("item_name,sell_in, days_passed, expected_sell_in", [
     ("foo", 2, 2, 0),  # base case for all items
@@ -210,6 +206,23 @@ def test_decrement_sell_in(item_name, sell_in, days_passed, expected_sell_in):
     for _ in range(days_passed):
         gilded_rose.update_quality()
     assert gilded_rose.items[0].sell_in == expected_sell_in
+
+
+# 9.
+# missed case of quality degradation twice after sell_in has passed
+@pytest.mark.parametrize("item_name, starting_quality, expected_quality", [
+    ("foo", 2, 0),
+    ("Sulfuras, Hand of Ragnaros", 80, 80),
+    ("Aged Brie", 1, 3),
+    ("Backstage passes to a TAFKAL80ETC concert", 100, 0),
+    ("Conjured Mana Cake", 10, 6)
+])
+def test_degrade_quality_twice_faster(item_name, starting_quality, expected_quality):
+    # Start with Sell_in = 0 to force expiration logic immediately
+    items = [Item(item_name, 0, starting_quality)]
+    gilded_rose = GildedRose(items)
+    gilded_rose.update_quality()
+    assert gilded_rose.items[0].quality == expected_quality
 
 
 if __name__ == '__main__':

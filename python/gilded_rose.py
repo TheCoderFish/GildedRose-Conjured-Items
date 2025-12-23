@@ -12,13 +12,20 @@ class GildedRose(object):
 
             item_name = item.name
 
+            # we are only calculating is_expired here and not decrementing sell in here
+            # moving sulfuras out of case can simplify code and remove duplicate deduction
+            # we have kept it along with other items for future logic updates which will be simple to modify
+            is_expired = item.sell_in - 1 < 0
+
             match item_name:
-                case "Aged Brie":
-                    item.quality = min(item.quality + 1, self.MAX_QUALITY_ALL_ITEMS_EXCEPT_SULFURAS)
-                    item.sell_in = item.sell_in - 1
 
                 case "Sulfuras, Hand of Ragnaros":
-                    pass
+                    continue
+
+                case "Aged Brie":
+                    increase_by = 2 if is_expired else 1
+                    item.quality = min(item.quality + increase_by, self.MAX_QUALITY_ALL_ITEMS_EXCEPT_SULFURAS)
+                    item.sell_in = item.sell_in - 1
 
                 case "Backstage passes to a TAFKAL80ETC concert":
                     sell_in = item.sell_in
@@ -34,11 +41,13 @@ class GildedRose(object):
                     item.sell_in = item.sell_in - 1
 
                 case "Conjured Mana Cake":
-                    item.quality = max(item.quality - 2, self.MIN_QUALITY_ALL_ITEMS_EXCEPT_SULFURAS)
+                    decrease_by = 4 if is_expired else 2
+                    item.quality = max(item.quality - decrease_by, self.MIN_QUALITY_ALL_ITEMS_EXCEPT_SULFURAS)
                     item.sell_in = item.sell_in - 1
 
                 case _:
-                    item.quality = max(item.quality - 1, self.MIN_QUALITY_ALL_ITEMS_EXCEPT_SULFURAS)
+                    decrease_by = 2 if is_expired else 1
+                    item.quality = max(item.quality - decrease_by, self.MIN_QUALITY_ALL_ITEMS_EXCEPT_SULFURAS)
                     item.sell_in = item.sell_in - 1
 
 
